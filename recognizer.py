@@ -23,5 +23,8 @@ def recognize_by_DeepSpeech(file):
 
 
 if __name__ == '__main__':
-    print(recognize_by_SpeechRecognizer("C:/ASR/audio/2830-3980-0043.wav"))
-    print(recognize_by_DeepSpeech("C:/ASR/audio/2830-3980-0043.wav"))
+    # print(recognize_by_SpeechRecognizer("C:/ASR/audio/2830-3980-0043.wav"))
+    # print(recognize_by_DeepSpeech("C:/ASR/audio/2830-3980-0043.wav"))
+
+# print(recognize_by_SpeechRecognizer("C:/ASR/audio/dialog.wav"))
+    print(recognize_by_DeepSpeech("C:/ASR/audio/dialog.wav"))
