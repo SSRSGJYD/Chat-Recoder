@@ -76,9 +76,9 @@ class Speaker:
     def __init__(self, audio, sr):
         self.audio = audio
         self.sr = sr
-        # self.distances = self.intra_mfcc_distances(sr // 100)
+        self.distances = self.intra_mfcc_distances(self.sr // 100)
         # self.distances.sort()
-        # print(np.histogram(np.array(self.distances), 5))
+        print('intra:', np.histogram(np.array(self.distances), 5))
         # self.mean = sum(self.distances) / len(self.distances)
         # print(self.mean)
         # print(self.distances[30])
@@ -95,7 +95,7 @@ class Speaker:
         distances = inter_mfcc_distances(self.audio, segment, self.sr // 100)
         # print('max:', max(distances))
         # print('min:', min(distances))
-        print(np.histogram(np.array(distances), 5))
+        print('inter:', np.histogram(np.array(distances), 5))
         # greater_l = list(filter(lambda x:x>200, distances))
         # if len(greater_l) < 10:
         #     return True
@@ -161,12 +161,9 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    orig_data1, sr1 = librosa.load('C:/ASR/audio/dialog_no_silence_part3.wav', mono=True)
+    orig_data1, sr1 = librosa.load('C:/ASR/audio/speaker1.wav', mono=True)
+    orig_data2, sr2 = librosa.load('C:/ASR/audio/speaker2.wav', mono=True)
     segment_length = int(sr1 / 100)
-    speaker = Speaker(orig_data1[100*segment_length: 200*segment_length], sr1)
-    # orig_data2, sr2 = librosa.load('C:/ASR/audio/dialog_no_silence_part3.wav', mono=True)
-    orig_data2, sr2 = librosa.load('C:/ASR/audio/dialog_no_silence_part2.wav', mono=True)
-    for i in [100, 400, 800, 1200]:
-        # print(speaker.belong_to(orig_data2[i*segment_length: (i+1)*segment_length]))
-        speaker.belong_to(orig_data2[i*segment_length: (i+1)*segment_length])
-
+    speaker = Speaker(orig_data1, sr1)
+    speaker.belong_to(orig_data2)
+    
