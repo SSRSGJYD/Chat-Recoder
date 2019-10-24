@@ -146,7 +146,7 @@ def segment_by_voice(segments, samplerate=16000, segment_length=None, threshold=
 
 
 def main():
-    orig_data, sr = librosa.load('C:/ASR/audio/dialog.wav', mono=True)
+    orig_data, sr = librosa.load('C:/ASR/audio/dialog.mp3', mono=True)
     print('original', orig_data.shape[0])
     segments = extract_nonsilence(orig_data, samplerate=sr)
     print(len(segments))
@@ -155,15 +155,15 @@ def main():
         # print(data.shape)
         # soundfile.write('C:/ASR/audio/dialog_no_silence_part{}.wav'.format(i+1), data, sr)
 
-    voice_segments = segment_by_voice(segments, samplerate=sr, threshold=150)
-    print(len(voice_segments))
+    # voice_segments = segment_by_voice(segments, samplerate=sr, threshold=150)
+    # print(len(voice_segments))
 
 
 if __name__ == '__main__':
-    # main()
-    orig_data1, sr1 = librosa.load('C:/ASR/audio/speaker1.wav', mono=True)
-    orig_data2, sr2 = librosa.load('C:/ASR/audio/speaker2.wav', mono=True)
-    segment_length = int(sr1 / 100)
-    speaker = Speaker(orig_data1, sr1)
-    speaker.belong_to(orig_data2)
+    main()
+    # orig_data1, sr1 = librosa.load('C:/ASR/audio/speaker1.wav', mono=True)
+    # orig_data2, sr2 = librosa.load('C:/ASR/audio/speaker2.wav', mono=True)
+    # segment_length = int(sr1 / 100)
+    # speaker = Speaker(orig_data1, sr1)
+    # speaker.belong_to(orig_data2)
     

@@ -4,6 +4,18 @@
 
 ## Submodules
 
+### MP3 to WAV
+
+example usage:
+
+```python
+import util
+
+util.mp3_to_wav.trans_mp3_to_wav('path/to/input/mp3', 'path/to/output/wav')
+```
+
+
+
 ### Silence Removal
 
 example usage:
@@ -12,7 +24,7 @@ example usage:
 import util
 import librosa
 
-orig_data, sr = librosa.load('C:/ASR/audio/dialog.wav', mono=True)
+orig_data, sr = librosa.load('path/to/wav', mono=True)
 segment_list = util.verification.extract_nonsilence(orig_data, samplerate=sr)
 ```
 
