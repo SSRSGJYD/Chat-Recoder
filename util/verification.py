@@ -11,6 +11,7 @@ def extract_nonsilence(data, min_segment_duration=1.0, samplerate=16000, segment
     You would consider apply a noise filter before using this silence filter or make sure that environment noise is small enough to be considered as silence.
 
     :param data: the audio signal data
+    :param min_segment_duration: pre-set minimum duration of a segment in second
     :param samplerate: if no segment_length is given, segment_length will be equals samplerate/100 (around 0.01 secs per segment).
     :param segment_length: the number of frames per segment. I.e. for a sample rate SR, a segment length equals SR/100 will represent a chunk containing 0.01 seconds of audio.
     :param threshold: the threshold value. Values less than or equal values will be cut off. The default value was defined at [1] (see the references).
