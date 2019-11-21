@@ -2,9 +2,10 @@ import numpy as np
 import librosa
 import speaker_verification_toolkit.tools as svt
 import soundfile
+import tqdm
 
 
-def extract_nonsilence(data, samplerate=16000, segment_length=None, threshold=0.001135):
+def extract_nonsilence(data, min_segment_duration=1.0, samplerate=16000, segment_length=None, threshold=0.001135):
     '''
     Cut off silence parts from the signal audio data. Doesn't work with signals data affected by environment noise.
     You would consider apply a noise filter before using this silence filter or make sure that environment noise is small enough to be considered as silence.
@@ -21,7 +22,7 @@ def extract_nonsilence(data, samplerate=16000, segment_length=None, threshold=0.
     segments = []
     filtered_data = np.array([])
 
-    for index in range(0, len(data), segment_length):
+    for index in tqdm.tqdm(range(0, len(data), segment_length)):
         data_slice = data[index : index + segment_length]
 
         squared_data_slice = np.square(data_slice)
@@ -29,11 +30,11 @@ def extract_nonsilence(data, samplerate=16000, segment_length=None, threshold=0.
 
         if mean > threshold:
             filtered_data = np.append(filtered_data, data_slice)
-        elif filtered_data.shape[0] > 0:
+        elif filtered_data.shape[0] > samplerate * min_segment_duration:
             segments.append(filtered_data)
             filtered_data = np.array([])
 
-    if filtered_data.shape[0] > 0:
+    if filtered_data.shape[0] > samplerate * min_segment_duration:
         segments.append(filtered_data)
 
     return segments
@@ -146,14 +147,13 @@ def segment_by_voice(segments, samplerate=16000, segment_length=None, threshold=
 
 
 def main():
-    orig_data, sr = librosa.load('C:/ASR/audio/dialog.mp3', mono=True)
+    orig_data, sr = librosa.load('C:/ASR/audio/dialog_no_silence.wav', mono=True)
     print('original', orig_data.shape[0])
-    segments = extract_nonsilence(orig_data, samplerate=sr)
+    segments = extract_nonsilence(orig_data, 1.0, samplerate=sr, threshold=0.002)
     print(len(segments))
 
-    # for i, data in enumerate(segments):
-        # print(data.shape)
-        # soundfile.write('C:/ASR/audio/dialog_no_silence_part{}.wav'.format(i+1), data, sr)
+    for i, data in enumerate(segments):
+        soundfile.write('C:/ASR/audio/tmp/dialog_no_silence_part{}.wav'.format(i+1), data, sr)
 
     # voice_segments = segment_by_voice(segments, samplerate=sr, threshold=150)
     # print(len(voice_segments))
