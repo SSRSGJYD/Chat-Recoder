@@ -10,7 +10,6 @@ from pyannote.audio.signal import Peak
 from pyannote.core import SlidingWindowFeature
 from pyannote.core import Timeline
 from pyannote.core import notebook
-from GUI import AudioGUI
 
 from model.DeepSpeech import DeepSpeechWrapper
 
@@ -36,31 +35,41 @@ class SpeakerSegmentation:
         self.fa[x] = self.find_parent(self.fa[x])
         return self.fa[x]
 
-    def min_spanning_tree(self, input, target_component=1, target_threshold=1e9):
+    def min_spanning_tree(self, input, target_component=1, target_threshold=0.4):
         self.fa = np.full(len(input), -1, np.int32)
         n_component = len(input)
-        dist = []
-        for i in range(len(input)):
-            for j in range(i + 1, len(input)):
-                dist.append([l2_dist(input[i][1], input[j][1]), i, j])
-        dist = list(sorted(dist))
-        for d, i, j in dist:
-            print('pending dist:', d)
-            if d > target_threshold:
+        # dist = []
+        # for i in range(len(input)):
+        #     for j in range(i + 1, len(input)):
+        #         dist.append([l2_dist(input[i][1], input[j][1]), i, j])
+        # dist = list(sorted(dist))
+        while n_component > target_component:
+            best_d = 1e9
+            best_x = -1
+            best_y = -1
+            for i in range(len(input)):
+                for j in range(i + 1, len(input)):
+                    x = self.find_parent(i)
+                    y = self.find_parent(j)
+                    if x != y:
+                        d = l2_dist(input[x][1], input[y][1])
+                        if best_d > d:
+                            best_d = d
+                            best_x = x
+                            best_y = y
+            if best_d > target_threshold:
                 break
-            if n_component <= target_component:
-                break
-            print('accepted dist:', d)  # fixme
-            i = self.find_parent(i)
-            j = self.find_parent(j)
-            if i != j:
-                self.fa[j] = i
-                n_component -= 1
+            self.fa[best_y] = best_x
+            input[best_x] = (input[best_x][0],
+                             (input[best_x][1] * input[best_x][2] + input[best_y][1] * input[best_y][2]) / (
+                                     input[best_x][2] + input[best_y][2]),
+                             input[best_x][2] + input[best_y][2])
+            n_component -= 1
 
         res = []
         namespace = {}
         names = iter(string.ascii_uppercase)  # will fail if more than 26 people
-        for i, (segment, _) in enumerate(input):
+        for i, (segment, _, _) in enumerate(input):
             p = self.find_parent(i)
             if p not in namespace:
                 namespace[p] = next(names)
@@ -72,9 +81,9 @@ class SpeakerSegmentation:
                 }), res[-1][1])
             else:
                 res.append((segment, name))
-        return res
+        return res, n_component
 
-    def annotate_speakers(self, filename, num_people, visualization=True):
+    def annotate_speakers(self, filename, gui, visualization=True):
         test_file = {'uri': 'filename', 'audio': filename}
 
         sad_scores = self.sad(test_file)
@@ -94,10 +103,11 @@ class SpeakerSegmentation:
             x = embeddings.crop(segment, mode='strict')
             if x.size == 0:
                 continue
+            n_sample = x.shape[0]
             x = np.mean(x, axis=0)
             if np.any(np.isnan(x)):
                 continue
-            res.append((segment, x))
+            res.append((segment, x, n_sample))
 
         if visualization:
 
@@ -148,7 +158,9 @@ class SpeakerSegmentation:
 
             fig.show()
 
-        res = self.min_spanning_tree(res, target_component=num_people)
+        res, num_people = self.min_spanning_tree(res)
+        gui.append_line('There are {} people in this audio'.format(num_people))
+
         return res
 
 
@@ -167,15 +179,18 @@ def recognize_by_SpeechRecognizer(file):
         print("Sphinx error; {0}".format(e))
 
 
-def recognize_by_DeepSpeech(file, dir, num_people):
+def recognize_by_DeepSpeech(file, dir, gui):
     wrapper = DeepSpeechWrapper(dir)
     wrapper.set_input(file)
     slicer = SpeakerSegmentation(SAD_MODEL, SCD_MODEL, EMB_MODEL)
-    slices = slicer.annotate_speakers(file, num_people, visualization=False)
-    for segment, name in slices:
+    slices = slicer.annotate_speakers(file, gui, visualization=False)
+    n_slice = len(slices)
+    for i, (segment, name) in enumerate(slices):
         text = wrapper.recognize_audio(segment.start, segment.end)
-        print(name + ':', text, segment)
-    print(wrapper.recognize_audio(0, wrapper.audio_length))
+        gui.append_line('{}: {} {}'.format(name, text, segment))
+        gui.pg_bar.setValue(i / n_slice * 100)
+    gui.append_line('Original text: {}'.format(wrapper.recognize_audio(0, wrapper.audio_length)))
+    gui.pg_bar.setValue(1)
 
 
 if __name__ == '__main__':
@@ -184,4 +199,5 @@ if __name__ == '__main__':
 
     # print(recognize_by_SpeechRecognizer("C:/ASR/audio/dialog.wav"))
     # print(recognize_by_DeepSpeech("C:/ASR/audio/dialog.wav"))
-    recognize_by_DeepSpeech('data/dialog.wav', 'data/deepspeech-0.5.1-models', 2)
+    # recognize_by_DeepSpeech('data/dialog.wav', 'data/deepspeech-0.5.1-models', 2)
+    pass

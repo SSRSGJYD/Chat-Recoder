@@ -41,8 +41,8 @@ Pretrained deepspeech model can be downloaded at https://github.com/mozilla/Deep
 example usage:
 
 ```python
-import main
+import recognizer
 
-text = main.recognize_by_DeepSpeech('path/to/wav', dir='path/to/pretrained/model')
+text = recognizer.recognize_by_DeepSpeech('path/to/wav', dir='path/to/pretrained/model')
 ```
 
