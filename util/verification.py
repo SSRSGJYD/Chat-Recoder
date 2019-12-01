@@ -7,9 +7,6 @@ import tqdm
 
 def extract_nonsilence(data, min_segment_duration=1.0, samplerate=16000, segment_length=None, threshold=0.001135):
     '''
-    Cut off silence parts from the signal audio data. Doesn't work with signals data affected by environment noise.
-    You would consider apply a noise filter before using this silence filter or make sure that environment noise is small enough to be considered as silence.
-
     :param data: the audio signal data
     :param min_segment_duration: pre-set minimum duration of a segment in second
     :param samplerate: if no segment_length is given, segment_length will be equals samplerate/100 (around 0.01 secs per segment).
@@ -156,15 +153,7 @@ def main():
     for i, data in enumerate(segments):
         soundfile.write('C:/ASR/audio/tmp/dialog_no_silence_part{}.wav'.format(i+1), data, sr)
 
-    # voice_segments = segment_by_voice(segments, samplerate=sr, threshold=150)
-    # print(len(voice_segments))
-
 
 if __name__ == '__main__':
     main()
-    # orig_data1, sr1 = librosa.load('C:/ASR/audio/speaker1.wav', mono=True)
-    # orig_data2, sr2 = librosa.load('C:/ASR/audio/speaker2.wav', mono=True)
-    # segment_length = int(sr1 / 100)
-    # speaker = Speaker(orig_data1, sr1)
-    # speaker.belong_to(orig_data2)
     

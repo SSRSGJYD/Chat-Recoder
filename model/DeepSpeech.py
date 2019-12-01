@@ -83,12 +83,8 @@ class DeepSpeechWrapper:
                             help='Output string from extended metadata')
         self.args = parser.parse_args('')  # shadow the system args
 
-        # print('Loading model from file {}'.format(args.model), file=sys.stderr)
-        # model_load_start = timer()
         self.ds = Model(self.args.model, N_FEATURES, N_CONTEXT, self.args.alphabet, BEAM_WIDTH)
-        # model_load_end = timer() - model_load_start
-        # print('Loaded model in {:.3}s.'.format(model_load_end), file=sys.stderr)
-
+        
         self.audio = None
         self.audio_length = 0
         self.fs = 16000
@@ -116,8 +112,6 @@ class DeepSpeechWrapper:
         fin.close()
 
     def recognize_audio(self, start_time, end_time):
-        # print('Running inference.', file=sys.stderr)
-        # inference_start = timer()
         start_frame = int(start_time * self.fs)
         end_frame = int(end_time * self.fs)
         seq = self.audio[start_frame:end_frame]
@@ -125,5 +119,3 @@ class DeepSpeechWrapper:
             return metadata_to_string(self.ds.sttWithMetadata(seq, self.fs))
         else:
             return self.ds.stt(seq, self.fs)
-        # inference_end = timer() - inference_start
-        # print('Inference took %0.3fs for %0.3fs audio file.' % (inference_end, audio_length), file=sys.stderr)
