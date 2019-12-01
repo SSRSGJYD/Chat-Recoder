@@ -18,17 +18,33 @@ util.mp3_to_wav.trans_mp3_to_wav('path/to/input/mp3', 'path/to/output/wav')
 
 ### Silence Removal
 
-example usage:
+Example usage:
 
 ```python
 import util
 import librosa
 
 orig_data, sr = librosa.load('path/to/wav', mono=True)
-segment_list = util.verification.extract_nonsilence(orig_data, samplerate=sr)
+segment_list = util.verification.extract_nonsilence(orig_data, min_segment_duration=1.0, samplerate=sr)
 ```
 
 where `segment_list` is a list of `numpy.ndarray` .
+
+You can set `min_segment_duration` which is the minimum duration of a segment in second.
+
+
+
+### Split sentences
+
+To make sure that different sentences be split, set a larger `threshold` . By experience, 0.002 is enough.
+
+```python
+import util
+import librosa
+
+orig_data, sr = librosa.load('path/to/wav', mono=True)
+segment_list = util.verification.extract_nonsilence(orig_data, min_segment_duration=1.0, samplerate=sr, threshold=0.002)
+```
 
 
 
