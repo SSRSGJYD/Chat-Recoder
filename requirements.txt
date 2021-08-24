@@ -67,7 +67,7 @@ munkres==1.1.2
 nbconvert==5.6.0
 nbformat==4.4.0
 networkx==2.2
-notebook==6.0.1
+notebook==6.4.1
 numba==0.46.0
 numpy==1.15.4
 open3d==0.8.0.0
@@ -87,7 +87,7 @@ prometheus-client==0.7.1
 prompt-toolkit==2.0.9
 protobuf==3.9.1
 ptyprocess==0.6.0
-pyannote.audio===JSALT-v5-29.g9ac612e
+pyannote.audio
 pyannote.core==3.0+2.g14ff219
 pyannote.database==2.3.1
 pyannote.generators==2.0
